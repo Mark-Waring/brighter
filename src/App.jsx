@@ -21,7 +21,7 @@ class AdaptiveLearning {
       isCorrect,
     });
 
-    if (this.questionsPerLevel !== currentLevel) {
+    if (this.questionsPerLevel !== currentLevel + 1) {
       this.questionsPerLevel = currentLevel + 1;
     }
 
@@ -109,7 +109,6 @@ export default function App() {
     setFeedback({ isVisible: true, isCorrect });
 
     const levelChange = adaptiveSystem.processResponse(isCorrect, level);
-
     const newLevel = Math.max(1, Math.min(9, level + levelChange));
     const newComps = getNewCompsByLevel(newLevel);
     setGuessOptions(newComps.base);
