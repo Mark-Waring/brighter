@@ -4,45 +4,9 @@ import { useState, useEffect } from "react";
 import Guess from "./Guess";
 import Comps from "./Comps";
 import FeedbackOverlay from "./FeedbackOverlay";
+import AdaptiveLearning from "./adaptiveLearning";
 import { extendTheme, ChakraProvider } from "@chakra-ui/react";
 import { bodyTheme, getNewCompsByLevel } from "./utils";
-
-class AdaptiveLearning {
-  constructor(config = {}) {
-    this.questionsPerLevel = config.questionsPerLevel;
-    this.masteryThreshold = config.masteryThreshold || 0.8;
-    this.demotionThreshold = config.demotionThreshold || 0.3;
-    this.performanceHistory = [];
-  }
-
-  processResponse(isCorrect, currentLevel) {
-    this.performanceHistory.push({
-      level: currentLevel,
-      isCorrect,
-    });
-
-    if (this.questionsPerLevel !== currentLevel + 1) {
-      this.questionsPerLevel = currentLevel + 1;
-    }
-
-    const recentPerformance = this.performanceHistory
-      .filter((p) => p.level === currentLevel)
-      .slice(-this.questionsPerLevel);
-
-    const mastery =
-      recentPerformance.filter((p) => p.isCorrect).length /
-      recentPerformance.length;
-
-    if (recentPerformance.length >= this.questionsPerLevel) {
-      if (mastery >= this.masteryThreshold) {
-        return 1;
-      } else if (mastery <= this.demotionThreshold) {
-        return -1;
-      }
-    }
-    return 0;
-  }
-}
 
 export default function App() {
   const [guessOptions, setGuessOptions] = useState(null);
@@ -58,13 +22,12 @@ export default function App() {
 
   const canGuess = isGameActive && !displayedOption;
 
-  const GAME_LENGTH_IN_MILLISECONDS = 60000;
+  const GAME_LENGTH_IN_MILLISECONDS = 90000;
 
-  // Timer effect
   useEffect(() => {
     let timer;
     if (isGameActive) {
-      setTimeout(() => {
+      timer = setTimeout(() => {
         setIsGameActive(false);
         setGuessOptions(null);
         setDisplayedOption(null);
@@ -99,17 +62,17 @@ export default function App() {
         setDisplayedOption(
           displayedOption === guessOptions[0] ? guessOptions[1] : null
         );
-      }, (level - 1 || 1) * 1000);
+      }, Math.max(level ** 2 * 250, 1000));
       return () => clearTimeout(timer);
     }
   }, [displayedOption, feedback.isVisible]);
 
   function handleGuess(idx) {
-    const isCorrect = idx === 0 ? diff > 0 : diff < 0;
+    const isCorrect = idx === 0 ? diff >= 0 : diff <= 0;
     setFeedback({ isVisible: true, isCorrect });
 
     const levelChange = adaptiveSystem.processResponse(isCorrect, level);
-    const newLevel = Math.max(1, Math.min(9, level + levelChange));
+    const newLevel = level + levelChange;
     const newComps = getNewCompsByLevel(newLevel);
     setGuessOptions(newComps.base);
     setDiff(newComps.diff);
@@ -147,7 +110,7 @@ export default function App() {
             },
           }}
         >
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((option) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((option) => (
             <option key={option} value={option}>
               Level {option}
             </option>

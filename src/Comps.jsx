@@ -8,14 +8,15 @@ import { getWrapperProps } from "./utils";
 // length of sound, distance of sound range
 // animation speed
 
-export default function Comps({ guessOptions, depth, level }) {
-  if (typeof guessOptions === "number") {
+export default function Comps({ guessOptions: brightnessVals, depth, level }) {
+  if (typeof brightnessVals === "number") {
+    let brightness = brightnessVals;
     return (
       <Box
         style={{
           fontSize: `${15 / depth}em`,
           color: "#F7F7F7",
-          filter: `brightness(${guessOptions / 100})`,
+          filter: `brightness(${brightness / 100})`,
         }}
       >
         💡
@@ -23,8 +24,8 @@ export default function Comps({ guessOptions, depth, level }) {
     );
   }
   return (
-    <Flex {...getWrapperProps(level, depth, guessOptions)}>
-      {guessOptions.map((item, idx) => (
+    <Flex {...getWrapperProps(level, depth, brightnessVals)}>
+      {brightnessVals.map((item, idx) => (
         <Comps key={idx} guessOptions={item} depth={depth + 1} level={level} />
       ))}
     </Flex>

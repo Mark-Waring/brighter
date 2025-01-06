@@ -23,8 +23,8 @@ export default function FeedbackOverlay({
         right: 0,
         bottom: 0,
         backgroundColor: isCorrect
-          ? "rgba(72, 187, 120, 0.2)"
-          : "rgba(245, 101, 101, 0.2)",
+          ? "rgba(72, 187, 120, 0.4)"
+          : "rgba(245, 101, 101, 0.4)",
         pointerEvents: "none",
         animation: "fadeOut 0.2s ease-out",
         zIndex: 1000,

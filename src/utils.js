@@ -1,21 +1,18 @@
 export function getNewCompsByLevel(level) {
-  let base = [getRandomBrightness(), getRandomBrightness()];
-  for (let i = 1; i < level; i++) {
-    base = [
-      [...replaceNumbersWithRandom(base)],
-      [...replaceNumbersWithRandom(base)],
-    ];
-  }
-  let diff = testGuess(base);
-  if (Math.abs(diff) < 3) {
-    base = getNewCompsByLevel(level).base;
-  }
+  const base = generateNestedComps(level);
+  const diff = getDiff(base);
   return { base, diff };
 }
 
+function generateNestedComps(depth) {
+  if (depth === 1) {
+    return [getRandomBrightness(), getRandomBrightness()];
+  }
+  return [generateNestedComps(depth - 1), generateNestedComps(depth - 1)];
+}
+
 export function getRandomBrightness() {
-  // return Math.floor(Math.random() * (10 - 2) + 2);
-  return Math.floor(Math.random() * (100 - 20) + 20);
+  return Math.floor(Math.random() * 100 + 50);
 }
 
 export function replaceNumbersWithRandom(valueSet) {
@@ -25,16 +22,13 @@ export function replaceNumbersWithRandom(valueSet) {
   return valueSet.map((item) => replaceNumbersWithRandom(item));
 }
 
-export function testGuess(valueSet) {
+function getDiff(valueSet) {
   const currGuess = valueSet[0];
   const otherGuess = valueSet[1];
   if (!Array.isArray(currGuess)) {
     return currGuess - otherGuess;
   }
-  return (
-    Math.round(Math.abs(testGuess(currGuess))) -
-    Math.round(Math.abs(testGuess(otherGuess)))
-  );
+  return Math.abs(getDiff(currGuess)) - Math.abs(getDiff(otherGuess));
 }
 
 export const bodyTheme = {
